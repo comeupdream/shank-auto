@@ -122,7 +122,7 @@ export default function AdminSchedule() {
       </div>
 
       {/* ------------------------------------------------------ Sheet import */}
-      <section className="rounded-lg bg-white p-5 shadow-sm">
+      <section className="rounded-lg bg-white p-5 shadow-card">
         <h2 className="font-semibold text-slate-900">Import a schedule sheet</h2>
         <p className="mt-1 text-sm text-slate-600">
           Upload .xlsx or .csv. First row must be headers; needs{" "}
@@ -141,7 +141,7 @@ export default function AdminSchedule() {
           <button
             type="submit"
             disabled={uploading}
-            className="shrink-0 rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-700 disabled:opacity-50"
+            className="shrink-0 rounded-md bg-navy-600 px-4 py-2 text-sm font-semibold text-white hover:bg-navy-700 disabled:opacity-50"
           >
             {uploading ? "Importing…" : "Import"}
           </button>
@@ -187,7 +187,7 @@ export default function AdminSchedule() {
               <h3 className="text-sm font-bold uppercase tracking-wide text-accent-dark">
                 {date}
               </h3>
-              <ul className="mt-1 divide-y divide-slate-200 rounded-lg bg-white shadow-sm">
+              <ul className="mt-1 divide-y divide-slate-200 rounded-lg bg-white shadow-card">
                 {day.map((a) => (
                   <li key={a.id} className="flex flex-wrap items-baseline gap-x-3 gap-y-1 p-3 text-sm">
                     <span className="w-20 font-mono font-semibold text-slate-900">
@@ -208,7 +208,7 @@ export default function AdminSchedule() {
                       <span
                         className={`rounded px-1.5 py-0.5 text-xs ${
                           a.status === "CONFIRMED"
-                            ? "bg-sky-100 text-sky-800"
+                            ? "bg-navy-100 text-navy-800"
                             : a.status === "COMPLETED"
                               ? "bg-green-100 text-green-800"
                               : "bg-slate-100 text-slate-500"

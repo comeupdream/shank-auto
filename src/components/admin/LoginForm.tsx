@@ -32,7 +32,7 @@ export default function LoginForm() {
   }
 
   return (
-    <form onSubmit={submit} className="mx-auto mt-16 max-w-sm rounded-lg bg-white p-6 shadow-sm">
+    <form onSubmit={submit} className="mx-auto mt-16 max-w-sm rounded-lg bg-white p-6 shadow-card">
       <h1 className="text-xl font-bold text-slate-900">Shop schedule</h1>
       <label className="mt-4 block">
         <span className="mb-1 block text-sm font-semibold text-slate-900">Password</span>
@@ -41,7 +41,7 @@ export default function LoginForm() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           autoFocus
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-navy-500 focus:outline-none focus:ring-1 focus:ring-navy-500"
         />
       </label>
       {error && (
@@ -52,7 +52,7 @@ export default function LoginForm() {
       <button
         type="submit"
         disabled={busy}
-        className="mt-4 w-full rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-700 disabled:opacity-50"
+        className="mt-4 w-full rounded-md bg-navy-600 px-4 py-2 text-sm font-semibold text-white hover:bg-navy-700 disabled:opacity-50"
       >
         {busy ? "Signing in…" : "Sign in"}
       </button>

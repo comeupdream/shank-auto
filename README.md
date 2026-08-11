@@ -55,17 +55,29 @@ data source can be swapped without touching UI or routes. Included:
 | `local` (default) | — | Offline WMI + catalog. No network, no key. |
 | `vpic` | `VEHICLE_DATA_PROVIDER=vpic` | NHTSA vPIC (free, key-less): resolves **model, trim, body class** from the VIN — the part offline math can't do. Falls back to `local` on any error. |
 
-**On XAT Racing:** xatracing.com was investigated as the requested VIN/YMM
-source. It's a Toyota/Lexus performance-parts store whose "Choose Your
-Vehicle" pages are a static parts-catalog navigation — no VIN decoder or
-vehicle-data API is publicly exposed, and this dev environment's egress
-policy blocks the domain outright. If XAT publishes (or you have) an API
-endpoint, implement it as a third `VehicleDataProvider` alongside `vpic` —
-that's the seam it was built for.
+**From XAT Racing** ([comeupdream/XATRACING](https://github.com/comeupdream/XATRACING),
+xatracing.onrender.com), three things are ported:
 
-> Note: the dev sandbox also blocks `vpic.nhtsa.dot.gov`, so the vPIC provider
-> is written to the documented API shape but **unverified against the live
-> service** — test once from an unrestricted network.
+1. **The vPIC VIN pattern** (`assets/js/ymm.js`) — XAT decodes VINs by calling
+   NHTSA vPIC **from the browser** (free, keyless, CORS-open). The
+   VehiclePicker does the same: server decode first (instant, offline —
+   make/year/check digit), then a browser-side vPIC call fills in model +
+   trim. Server egress policy can't break it, because the customer's browser
+   makes the call.
+2. **Platform fitment** (`assets/data/ymm.json` → `src/lib/xat-fitment.ts`) —
+   XAT's curated chassis table. When a customer's vehicle lands on a
+   supported platform (LS400 → UCF20, Tundra → 3UR, …) the picker shows the
+   chassis code and stock engine.
+3. **The core charge program** (`src/lib/core-charges.ts`) — XAT's refundable
+   core-deposit model, adapted to the repair counter: leave the old part with
+   the shop and the deposit is waived; keep it and the deposit refunds when
+   the part comes back. Shown on `/services` and inside the estimate flow.
+
+> Note: this dev sandbox blocks `vpic.nhtsa.dot.gov`, so the server-side
+> vPIC provider and the browser-side call are written to the documented API
+> shape but **unverified against the live service from here** — the browser
+> path works wherever the customer's own network allows it (it's exactly
+> what xatracing.onrender.com ships).
 
 ## Run it
 

@@ -12,6 +12,7 @@
 
 import { useState } from "react";
 import VehiclePicker, { EMPTY_VEHICLE, type Vehicle } from "./VehiclePicker";
+import { coreChargesForService } from "@/lib/core-charges";
 import {
   CLASS_LABOR_MULTIPLIER,
   type Service,
@@ -36,6 +37,7 @@ export default function EstimateForm({ services }: Props) {
 
   const service = services.find((s) => s.id === serviceId);
   const price = service ? priceFor(service, vehicle.vehicleClass) : null;
+  const coreParts = service ? coreChargesForService(service.id) : [];
 
   const vehicleLabel = [vehicle.year, vehicle.make, vehicle.model, vehicle.trim]
     .filter(Boolean)
@@ -110,7 +112,7 @@ export default function EstimateForm({ services }: Props) {
               key={s.id}
               className={`flex cursor-pointer gap-3 rounded-md border p-3 text-sm ${
                 serviceId === s.id
-                  ? "border-sky-500 bg-sky-50"
+                  ? "border-navy-500 bg-navy-50"
                   : "border-slate-200 bg-white hover:border-slate-300"
               }`}
             >
@@ -131,23 +133,36 @@ export default function EstimateForm({ services }: Props) {
         </div>
 
         {service && (
-          <p className="mt-3 rounded-md bg-slate-100 p-3 text-sm text-slate-700">
-            {price === null ? (
-              <>
-                <strong>Priced after inspection.</strong> We&apos;ll look it over and
-                call you with a number before any work starts.
-              </>
-            ) : (
-              <>
-                <strong>{formatPrice(price)}</strong> for a{" "}
-                {VEHICLE_CLASS_LABELS[vehicle.vehicleClass].toLowerCase()}
-                {CLASS_LABOR_MULTIPLIER[vehicle.vehicleClass] !== 1 && (
-                  <> (includes the larger-vehicle labor rate)</>
-                )}
+          <div className="mt-3 rounded-md bg-slate-100 p-3 text-sm text-slate-700">
+            <p>
+              {price === null ? (
+                <>
+                  <strong>Priced after inspection.</strong> We&apos;ll look it over and
+                  call you with a number before any work starts.
+                </>
+              ) : (
+                <>
+                  <strong>{formatPrice(price)}</strong> for a{" "}
+                  {VEHICLE_CLASS_LABELS[vehicle.vehicleClass].toLowerCase()}
+                  {CLASS_LABOR_MULTIPLIER[vehicle.vehicleClass] !== 1 && (
+                    <> (includes the larger-vehicle labor rate)</>
+                  )}
+                  .
+                </>
+              )}
+            </p>
+            {coreParts.length > 0 && (
+              <p className="mt-2 text-xs text-slate-600">
+                This job can involve core-charged parts (
+                {coreParts.map((c) => c.part.toLowerCase()).join(", ")}). Leave the
+                old part with us and the refundable core deposit is waived —{" "}
+                <a href="/services" className="underline">
+                  core charge program
+                </a>
                 .
-              </>
+              </p>
             )}
-          </p>
+          </div>
         )}
 
         <label className="mt-4 block">
@@ -160,7 +175,7 @@ export default function EstimateForm({ services }: Props) {
             onChange={(e) => setConcern(e.target.value)}
             rows={3}
             placeholder="Noises, warning lights, when it happens…"
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-navy-500 focus:outline-none focus:ring-1 focus:ring-navy-500"
           />
         </label>
       </fieldset>
@@ -183,7 +198,7 @@ export default function EstimateForm({ services }: Props) {
       <button
         type="submit"
         disabled={submitting}
-        className="rounded-md bg-sky-600 px-6 py-3 text-sm font-semibold text-white hover:bg-sky-700 disabled:opacity-50"
+        className="rounded-md bg-navy-600 px-6 py-3 text-sm font-semibold text-white hover:bg-navy-700 disabled:opacity-50"
       >
         {submitting ? "Sending…" : "Request estimate"}
       </button>
@@ -214,7 +229,7 @@ function Input({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-navy-500 focus:outline-none focus:ring-1 focus:ring-navy-500"
       />
     </label>
   );

@@ -14,10 +14,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   VEHICLE_CLASSES,
   VEHICLE_CLASS_LABELS,
+  canonicalMake,
   type Model,
   type VehicleClass,
   years as catalogYears,
 } from "@/lib/vehicle-catalog";
+import { fitmentSummary, matchFitment } from "@/lib/xat-fitment";
 
 export type Vehicle = {
   vin: string;
@@ -136,20 +138,42 @@ export default function VehiclePicker({ value, onChange }: Props) {
     try {
       const res = await fetch(`/api/vin/${encodeURIComponent(vin)}`);
       const data: DecodeResponse = await res.json();
-      setDecode(data);
 
       if (data.decoded && !data.decoded.valid) {
+        setDecode(data);
         setVinError(data.decoded.errors.join(" "));
         return;
       }
 
+      // Server decode gives make/year offline. For model + trim, do what the
+      // XAT Racing site does (assets/js/ymm.js): call NHTSA vPIC straight
+      // from the browser — free, keyless, CORS-open, and unaffected by
+      // server-side network policy. Best-effort: any failure just leaves the
+      // model dropdown for the customer.
+      let model = data.model;
+      let trim = data.trim;
+      let year = data.year;
+      let make = data.make;
+      let notes = data.notes;
+      if (!model) {
+        const live = await browserVpicDecode(vin);
+        if (live) {
+          model = live.model ?? model;
+          trim = live.trim ?? trim;
+          year = live.year ?? year;
+          make = live.make ?? make;
+          notes = notes.filter((n) => !n.startsWith("Model and trim"));
+        }
+      }
+      setDecode({ ...data, model, trim, year, make, notes });
+
       classTouched.current = false;
       onChange({
         ...value,
-        year: data.year ? String(data.year) : value.year,
-        make: data.make ?? value.make,
-        model: data.model ?? "",
-        trim: data.trim ?? "",
+        year: year ? String(year) : value.year,
+        make: make ?? value.make,
+        model: model ?? "",
+        trim: trim ?? "",
         vehicleClass: data.vehicleClass,
       });
     } catch {
@@ -160,6 +184,12 @@ export default function VehiclePicker({ value, onChange }: Props) {
   }
 
   const decoded = decode?.decoded;
+
+  // XAT platform fitment: classic Toyota/Lexus chassis + engine info, shown
+  // whenever the selected vehicle lands on a supported platform.
+  const fitment = value.year && value.make && value.model
+    ? matchFitment(Number(value.year), value.make, value.model)
+    : null;
 
   return (
     <div className="space-y-6">
@@ -188,13 +218,13 @@ export default function VehiclePicker({ value, onChange }: Props) {
             spellCheck={false}
             autoComplete="off"
             placeholder="1HGCM82633A004352"
-            className="w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm uppercase tracking-wider focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            className="w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm uppercase tracking-wider focus:border-navy-500 focus:outline-none focus:ring-1 focus:ring-navy-500"
           />
           <button
             type="button"
             onClick={() => void runDecode()}
             disabled={decoding}
-            className="shrink-0 rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-700 disabled:opacity-50"
+            className="shrink-0 rounded-md bg-navy-600 px-4 py-2 text-sm font-semibold text-white hover:bg-navy-700 disabled:opacity-50"
           >
             {decoding ? "Decoding…" : "Decode VIN"}
           </button>
@@ -282,6 +312,12 @@ export default function VehiclePicker({ value, onChange }: Props) {
         </Field>
       </section>
 
+      {fitment && (
+        <p className="rounded-md border border-navy-200 bg-navy-50 px-3 py-2 text-sm text-navy-900">
+          <strong>{fitment.model}</strong> — {fitmentSummary(fitment)}
+        </p>
+      )}
+
       <section className="grid gap-4 sm:grid-cols-2">
         <Field label="Trim / engine" hint="optional">
           <input
@@ -313,8 +349,50 @@ export default function VehiclePicker({ value, onChange }: Props) {
   );
 }
 
+/**
+ * Browser-side NHTSA vPIC decode — the XAT Racing pattern. Returns null on
+ * any failure (offline, blocked, malformed) so callers can fall through to
+ * manual selection.
+ */
+async function browserVpicDecode(vin: string): Promise<{
+  year: number | null;
+  make: string | null;
+  model: string | null;
+  trim: string | null;
+} | null> {
+  try {
+    const res = await fetch(
+      `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${encodeURIComponent(vin)}?format=json`,
+      { signal: AbortSignal.timeout(6000) },
+    );
+    if (!res.ok) return null;
+    const data = (await res.json()) as { Results?: Array<Record<string, string>> };
+    const r = data.Results?.[0];
+    if (!r) return null;
+    const clean = (k: string) => {
+      const v = r[k]?.trim();
+      return v && v !== "Not Applicable" ? v : null;
+    };
+    const makeRaw = clean("Make");
+    return {
+      year: Number(clean("ModelYear")) || null,
+      // vPIC yells makes in caps ("TOYOTA"); title-case for the dropdown.
+      // canonicalMake fixes vPIC's casing ("BMW" not "Bmw"); unknown makes
+      // keep a title-cased best effort.
+      make: makeRaw
+        ? canonicalMake(makeRaw) ??
+          makeRaw.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())
+        : null,
+      model: clean("Model"),
+      trim: clean("Trim") ?? clean("Series"),
+    };
+  } catch {
+    return null;
+  }
+}
+
 const selectClass =
-  "w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 disabled:bg-slate-100 disabled:text-slate-400";
+  "w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-navy-500 focus:outline-none focus:ring-1 focus:ring-navy-500 disabled:bg-slate-100 disabled:text-slate-400";
 
 function Field({
   label,

@@ -46,7 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <footer className="mt-8 border-t border-slate-300 bg-white">
           <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 text-sm sm:grid-cols-3">
             <div>
-              <a href={`mailto:${SHOP.email}`} className="text-sky-700 underline">
+              <a href={`mailto:${SHOP.email}`} className="text-navy-700 underline">
                 {SHOP.email}
               </a>
             </div>
@@ -57,7 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <br />
               {SHOP.cityLine}
               <br />
-              <a href={directionsHref()} className="text-sky-700 underline">
+              <a href={directionsHref()} className="text-navy-700 underline">
                 Directions
               </a>
             </address>

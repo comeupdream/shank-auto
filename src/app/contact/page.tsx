@@ -7,12 +7,12 @@ export default function ContactPage() {
     <div className="mx-auto max-w-2xl space-y-6">
       <h1 className="text-3xl font-bold text-slate-900">Contact</h1>
 
-      <div className="rounded-lg bg-white p-6 shadow-sm">
+      <div className="rounded-lg bg-white p-6 shadow-card">
         <dl className="space-y-4 text-sm">
           <div>
             <dt className="font-semibold text-slate-900">Phone</dt>
             <dd>
-              <a href={telHref()} className="text-sky-700 underline">
+              <a href={telHref()} className="text-navy-700 underline">
                 {SHOP.phone}
               </a>
             </dd>
@@ -20,7 +20,7 @@ export default function ContactPage() {
           <div>
             <dt className="font-semibold text-slate-900">Email</dt>
             <dd>
-              <a href={`mailto:${SHOP.email}`} className="text-sky-700 underline">
+              <a href={`mailto:${SHOP.email}`} className="text-navy-700 underline">
                 {SHOP.email}
               </a>
             </dd>
@@ -32,7 +32,7 @@ export default function ContactPage() {
               <br />
               {SHOP.cityLine}
               <br />
-              <a href={directionsHref()} className="text-sky-700 underline">
+              <a href={directionsHref()} className="text-navy-700 underline">
                 Get directions
               </a>
             </dd>

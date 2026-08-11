@@ -140,7 +140,7 @@ export default function BookingScheduler({ services, minDate, maxDate }: Props) 
               key={s.id}
               className={`flex cursor-pointer gap-3 rounded-md border p-3 text-sm ${
                 serviceId === s.id
-                  ? "border-sky-500 bg-sky-50"
+                  ? "border-navy-500 bg-navy-50"
                   : "border-slate-200 bg-white hover:border-slate-300"
               }`}
             >
@@ -174,7 +174,7 @@ export default function BookingScheduler({ services, minDate, maxDate }: Props) 
               min={minDate}
               max={maxDate}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-navy-500 focus:outline-none focus:ring-1 focus:ring-navy-500"
             />
           </label>
 
@@ -199,8 +199,8 @@ export default function BookingScheduler({ services, minDate, maxDate }: Props) 
                     onClick={() => setTime(t)}
                     className={`rounded-md border px-3 py-1.5 text-sm ${
                       time === t
-                        ? "border-sky-600 bg-sky-600 text-white"
-                        : "border-slate-300 bg-white text-slate-700 hover:border-sky-400"
+                        ? "border-navy-600 bg-navy-600 text-white"
+                        : "border-slate-300 bg-white text-slate-700 hover:border-navy-400"
                     }`}
                   >
                     {formatTime12(t)}
@@ -249,7 +249,7 @@ export default function BookingScheduler({ services, minDate, maxDate }: Props) 
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-navy-500 focus:outline-none focus:ring-1 focus:ring-navy-500"
           />
         </label>
       </fieldset>
@@ -263,7 +263,7 @@ export default function BookingScheduler({ services, minDate, maxDate }: Props) 
       <button
         type="submit"
         disabled={submitting}
-        className="rounded-md bg-sky-600 px-6 py-3 text-sm font-semibold text-white hover:bg-sky-700 disabled:opacity-50"
+        className="rounded-md bg-navy-600 px-6 py-3 text-sm font-semibold text-white hover:bg-navy-700 disabled:opacity-50"
       >
         {submitting ? "Booking…" : "Book it"}
       </button>
@@ -294,7 +294,7 @@ function Input({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-navy-500 focus:outline-none focus:ring-1 focus:ring-navy-500"
       />
     </label>
   );

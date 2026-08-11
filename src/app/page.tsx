@@ -5,7 +5,7 @@ import { servicesByCategory } from "@/lib/services";
 export default function HomePage() {
   return (
     <div className="space-y-10">
-      <section className="rounded-lg bg-white p-8 shadow-sm">
+      <section className="rounded-lg bg-white p-8 shadow-card">
         <h1 className="font-display text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
           {SHOP.name}
         </h1>
@@ -23,7 +23,7 @@ export default function HomePage() {
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 href="/estimate"
-                className="rounded-md bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-sky-700"
+                className="rounded-md bg-navy-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-navy-700"
               >
                 Get an estimate
               </Link>
@@ -54,7 +54,7 @@ export default function HomePage() {
         <h2 className="text-2xl font-bold text-slate-900">What we do</h2>
         <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {servicesByCategory().map(({ category, services }) => (
-            <div key={category} className="rounded-lg bg-white p-5 shadow-sm">
+            <div key={category} className="rounded-lg bg-white p-5 shadow-card">
               <h3 className="text-sm font-bold uppercase tracking-wide text-accent-dark">
                 {category}
               </h3>
