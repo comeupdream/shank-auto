@@ -1,0 +1,4 @@
+Date,Time,Customer,Phone,Email,Vehicle,VIN,Service,Duration,Notes,Status
+2026-08-17,8:00 AM,Randy Shifflett,540-555-0111,,2015 Ford F-250,,oil,,fleet truck — synthetic,
+2026-08-17,9:00 AM,Dawn Lam,540-555-0112,dawn@example.com,2021 Honda CR-V,,state inspection,,,
+2026-08-18,1:00 PM,Kim Ohr,540-555-0113,,2003 Honda Accord,1HGCM82633A004352,brakes,150,customer waiting,
