@@ -9,7 +9,7 @@ export default function ServicesPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">Services</h1>
+        <h1 className="font-display text-4xl font-semibold uppercase tracking-wide text-slate-900">Services</h1>
         <p className="mt-2 text-slate-600">
           Flat-rate maintenance is priced below. Repairs are quoted after we look
           the vehicle over — we call you with a number before any work starts.

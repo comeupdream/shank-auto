@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ShankLogo from "@/components/ShankLogo";
 import { SHOP, hoursForDisplay, telHref } from "@/lib/shop-config";
 import { servicesByCategory } from "@/lib/services";
 
@@ -6,10 +7,15 @@ export default function HomePage() {
   return (
     <div className="space-y-10">
       <section className="rounded-lg bg-white p-8 shadow-card">
-        <h1 className="font-display text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-          {SHOP.name}
-        </h1>
-        <p className="mt-2 text-lg text-slate-600">{SHOP.tagline}</p>
+        <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center">
+          <ShankLogo animate className="w-36 shrink-0 sm:w-44" />
+          <div>
+            <h1 className="font-display text-5xl font-semibold uppercase tracking-wide text-slate-900 sm:text-6xl">
+              {SHOP.name}
+            </h1>
+            <p className="mt-2 text-lg text-slate-600">{SHOP.tagline}</p>
+          </div>
+        </div>
 
         <div className="mt-6 grid gap-8 md:grid-cols-2">
           <div>
@@ -51,7 +57,7 @@ export default function HomePage() {
       </section>
 
       <section>
-        <h2 className="text-2xl font-bold text-slate-900">What we do</h2>
+        <h2 className="font-display text-3xl font-semibold uppercase tracking-wide text-slate-900">What we do</h2>
         <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {servicesByCategory().map(({ category, services }) => (
             <div key={category} className="rounded-lg bg-white p-5 shadow-card">

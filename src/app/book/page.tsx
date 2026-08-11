@@ -10,7 +10,7 @@ export default function BookPage() {
   const today = shopTodayISO();
   return (
     <div className="mx-auto max-w-3xl">
-      <h1 className="text-3xl font-bold text-slate-900">Schedule a drop-off</h1>
+      <h1 className="font-display text-4xl font-semibold uppercase tracking-wide text-slate-900">Schedule a drop-off</h1>
       <p className="mt-2 text-slate-600">
         Pick a service and a time that suits you. Times shown are open on our
         schedule — no double-booking.

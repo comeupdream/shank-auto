@@ -5,7 +5,7 @@ export const metadata = { title: "About — Shank Auto Repair" };
 export default function AboutPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-4">
-      <h1 className="text-3xl font-bold text-slate-900">About {SHOP.name}</h1>
+      <h1 className="font-display text-4xl font-semibold uppercase tracking-wide text-slate-900">About {SHOP.name}</h1>
       <p className="text-slate-600">{SHOP.tagline}</p>
 
       {/* TODO: replace with the shop's real story — years in business, the

@@ -34,7 +34,10 @@ const config: Config = {
         card: "0 1px 3px rgba(16, 32, 54, 0.10), 0 4px 14px rgba(16, 32, 54, 0.08)",
       },
       fontFamily: {
-        display: ['"Courier New"', "ui-monospace", "monospace"],
+        // Body: Inter (self-hosted via @fontsource). Display: Barlow
+        // Condensed — road-sign lettering, the classic automotive face.
+        sans: ['"Inter Variable"', "Inter", "system-ui", "sans-serif"],
+        display: ['"Barlow Condensed"', '"Arial Narrow"', "sans-serif"],
       },
     },
   },

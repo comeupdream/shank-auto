@@ -5,7 +5,7 @@ export const metadata = { title: "Contact — Shank Auto Repair" };
 export default function ContactPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-3xl font-bold text-slate-900">Contact</h1>
+      <h1 className="font-display text-4xl font-semibold uppercase tracking-wide text-slate-900">Contact</h1>
 
       <div className="rounded-lg bg-white p-6 shadow-card">
         <dl className="space-y-4 text-sm">

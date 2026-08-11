@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import "@fontsource-variable/inter";
+import "@fontsource/barlow-condensed/500.css";
+import "@fontsource/barlow-condensed/600.css";
+import "@fontsource/barlow-condensed/700.css";
 import "./globals.css";
+import ShankLogo from "@/components/ShankLogo";
 import { SHOP, directionsHref, telHref } from "@/lib/shop-config";
 
 export const metadata: Metadata = {
@@ -23,6 +28,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="flex min-h-screen flex-col">
         <header className="bg-chassis text-white">
           <nav className="mx-auto flex max-w-6xl flex-wrap items-center gap-1 px-4">
+            <Link href="/" aria-label="Shank Auto Repair home" className="mr-2 py-1.5">
+              <ShankLogo className="w-9" />
+            </Link>
             {NAV.map((item) => (
               <Link
                 key={item.href}

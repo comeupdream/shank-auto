@@ -9,3 +9,90 @@
 body {
   @apply bg-slate-100 text-slate-800 antialiased;
 }
+
+/* ---------------------------------------------------------------------------
+ * Shank shield logo — procedural build sequence (ShankLogo.tsx).
+ *
+ * Timeline: outline traces (0–1.1s) → chrome fills (0.9s) → wrenches swing
+ * into the cross (1.3s, staggered) → SHANK stamps (1.9s) → banner pops
+ * (2.2s) → a sheen sweeps the chrome every 7s from 3s on.
+ *
+ * Without .logo-anim every part sits in its final state, so the same
+ * component is the static header mark. prefers-reduced-motion collapses the
+ * whole sequence the same way.
+ * ------------------------------------------------------------------------- */
+
+.logo-outline {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+.logo-anim .logo-outline {
+  animation: logo-trace 1.1s ease-out both;
+}
+@keyframes logo-trace {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+.logo-anim .logo-fill {
+  animation: logo-fade 0.7s ease-out 0.9s both;
+}
+@keyframes logo-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.logo-wrench {
+  transform-origin: 100px 118px;
+  transform-box: view-box;
+}
+.logo-anim .logo-wrench--l {
+  animation: logo-swing-l 0.8s cubic-bezier(0.2, 1.4, 0.4, 1) 1.3s both;
+}
+.logo-anim .logo-wrench--r {
+  animation: logo-swing-r 0.8s cubic-bezier(0.2, 1.4, 0.4, 1) 1.5s both;
+}
+@keyframes logo-swing-l {
+  from { opacity: 0; transform: rotate(-70deg); }
+  to { opacity: 1; transform: rotate(0deg); }
+}
+@keyframes logo-swing-r {
+  from { opacity: 0; transform: rotate(70deg); }
+  to { opacity: 1; transform: rotate(0deg); }
+}
+
+.logo-anim .logo-word {
+  transform-origin: 100px 102px;
+  transform-box: view-box;
+  animation: logo-stamp 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) 1.9s both;
+}
+.logo-anim .logo-banner {
+  transform-origin: 100px 146px;
+  transform-box: view-box;
+  animation: logo-stamp 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) 2.2s both;
+}
+@keyframes logo-stamp {
+  from { opacity: 0; transform: scale(1.6); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.logo-sheen {
+  animation: logo-sheen 7s ease-in-out 3s infinite;
+}
+@keyframes logo-sheen {
+  0% { transform: skewX(-18deg) translateX(0); }
+  18% { transform: skewX(-18deg) translateX(340px); }
+  100% { transform: skewX(-18deg) translateX(340px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-anim .logo-outline,
+  .logo-anim .logo-fill,
+  .logo-anim .logo-wrench--l,
+  .logo-anim .logo-wrench--r,
+  .logo-anim .logo-word,
+  .logo-anim .logo-banner,
+  .logo-sheen {
+    animation: none;
+  }
+}

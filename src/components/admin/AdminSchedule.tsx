@@ -115,7 +115,7 @@ export default function AdminSchedule() {
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900">Shop schedule</h1>
+        <h1 className="font-display text-3xl font-semibold uppercase tracking-wide text-slate-900">Shop schedule</h1>
         <button onClick={() => void logout()} className="text-sm text-slate-500 underline">
           Sign out
         </button>
