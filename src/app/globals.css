@@ -52,7 +52,7 @@ body {
 }
 
 .logo-wrench {
-  transform-origin: 100px 118px;
+  transform-origin: 100px 124px;
   transform-box: view-box;
 }
 .logo-anim .logo-wrench--l {
@@ -71,12 +71,12 @@ body {
 }
 
 .logo-anim .logo-word {
-  transform-origin: 100px 102px;
+  transform-origin: 100px 95px;
   transform-box: view-box;
   animation: logo-stamp 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) 1.9s both;
 }
 .logo-anim .logo-banner {
-  transform-origin: 100px 146px;
+  transform-origin: 100px 152px;
   transform-box: view-box;
   animation: logo-stamp 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) 2.2s both;
 }
