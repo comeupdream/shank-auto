@@ -9,8 +9,21 @@ import ShankLogo from "@/components/ShankLogo";
 import { SHOP, directionsHref, telHref } from "@/lib/shop-config";
 
 export const metadata: Metadata = {
+  // Absolute base for og:image and friends. Defaults to the Render static
+  // site named in render.yaml; set NEXT_PUBLIC_SITE_URL when the domain
+  // changes (build-time, so it must be present when `next build` runs).
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://shank-auto.onrender.com"),
   title: `${SHOP.name} — Harrisonburg, VA`,
   description: SHOP.tagline,
+  openGraph: {
+    title: `${SHOP.name} — Harrisonburg, VA`,
+    description: `${SHOP.tagline} Instant quotes, VIN decoding, and online drop-off scheduling.`,
+    siteName: SHOP.name,
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 const NAV = [

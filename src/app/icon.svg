@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 230">
+  <!-- Favicon: the shield badge simplified for tiny sizes — silhouette,
+       steel oval, gear, and the wrench X. No lettering: it can't survive
+       16px, and the mark reads without it. -->
+  <path d="M20 30 C46 40 72 42 100 42 C128 42 154 40 180 30 C181 70 177 108 160 146 C148 172 126 194 100 214 C74 194 52 172 40 146 C23 108 19 70 20 30 Z" fill="#ffffff" stroke="#14161c" stroke-width="8"/>
+  <ellipse cx="100" cy="122" rx="58" ry="66" fill="#d3d8dd"/>
+  <circle cx="100" cy="122" r="30" fill="#2e3880"/>
+  <circle cx="100" cy="122" r="33.5" fill="none" stroke="#2e3880" stroke-width="7" stroke-dasharray="5.8 5.9"/>
+  <g stroke="#262e6d" stroke-width="3" fill="#c9d0d8">
+    <g transform="rotate(40 100 122)">
+      <rect x="93" y="64" width="14" height="112" rx="7"/>
+      <g transform="rotate(24 100 60)">
+        <path d="M87 52 A17 17 0 1 0 113 52 L106.5 59.5 A9 9 0 1 1 93.5 59.5 Z"/>
+      </g>
+      <circle cx="100" cy="184" r="14"/>
+      <circle cx="100" cy="184" r="6" fill="#2e3880" stroke="none"/>
+    </g>
+    <g transform="translate(200 0) scale(-1 1)">
+      <g transform="rotate(40 100 122)">
+        <rect x="93" y="64" width="14" height="112" rx="7"/>
+        <g transform="rotate(24 100 60)">
+          <path d="M87 52 A17 17 0 1 0 113 52 L106.5 59.5 A9 9 0 1 1 93.5 59.5 Z"/>
+        </g>
+        <circle cx="100" cy="184" r="14"/>
+        <circle cx="100" cy="184" r="6" fill="#2e3880" stroke="none"/>
+      </g>
+    </g>
+  </g>
+</svg>
