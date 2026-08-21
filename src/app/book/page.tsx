@@ -1,13 +1,9 @@
 import BookingScheduler from "@/components/BookingScheduler";
 import { SERVICES } from "@/lib/services";
-import { SHOP, shopTodayISO } from "@/lib/shop-config";
-import { addDaysISO } from "@/lib/time";
 
 export const metadata = { title: "Schedule Drop-off — Shank Auto Repair" };
-export const dynamic = "force-dynamic";
 
 export default function BookPage() {
-  const today = shopTodayISO();
   return (
     <div className="mx-auto max-w-3xl">
       <h1 className="font-display text-4xl font-semibold uppercase tracking-wide text-slate-900">Schedule a drop-off</h1>
@@ -17,11 +13,7 @@ export default function BookPage() {
       </p>
 
       <div className="mt-8">
-        <BookingScheduler
-          services={SERVICES}
-          minDate={today}
-          maxDate={addDaysISO(today, SHOP.bookingHorizonDays)}
-        />
+        <BookingScheduler services={SERVICES} />
       </div>
     </div>
   );

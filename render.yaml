@@ -1,0 +1,11 @@
+# Render Blueprint (https://render.com/docs/blueprint-spec).
+#
+# "New → Blueprint" on this repo provisions the static demo automatically.
+# Dashboard equivalent: New → Static Site with the same two values below.
+# Node version comes from .node-version.
+services:
+  - type: web
+    name: shank-auto
+    runtime: static
+    buildCommand: npm ci && npm run build:static
+    staticPublishPath: out

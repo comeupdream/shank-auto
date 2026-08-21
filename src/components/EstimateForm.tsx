@@ -19,6 +19,8 @@ import {
   formatPrice,
   priceFor,
 } from "@/lib/services";
+import { SHOP, telHref } from "@/lib/shop-config";
+import { STATIC_DEMO } from "@/lib/static-demo";
 import { VEHICLE_CLASS_LABELS } from "@/lib/vehicle-catalog";
 
 type Props = { services: Service[] };
@@ -53,6 +55,12 @@ export default function EstimateForm({ services }: Props) {
     }
     if (!serviceId) return setError("Please choose what you need.");
 
+    if (STATIC_DEMO) {
+      // Static preview — there is no server to send this to.
+      setSent(true);
+      return;
+    }
+
     setSubmitting(true);
     try {
       const res = await fetch("/api/estimates", {
@@ -83,6 +91,22 @@ export default function EstimateForm({ services }: Props) {
   }
 
   if (sent) {
+    if (STATIC_DEMO) {
+      return (
+        <div className="rounded-lg border border-amber-300 bg-amber-50 p-6">
+          <h2 className="text-lg font-bold text-amber-900">Demo only — nothing was sent</h2>
+          <p className="mt-2 text-sm text-amber-800">
+            This is a static preview, so your request about the{" "}
+            {vehicleLabel || "vehicle"} didn&apos;t go anywhere. For a real
+            estimate, call{" "}
+            <a href={telHref()} className="font-semibold underline">
+              {SHOP.phone}
+            </a>
+            .
+          </p>
+        </div>
+      );
+    }
     return (
       <div className="rounded-lg border border-green-300 bg-green-50 p-6">
         <h2 className="text-lg font-bold text-green-900">Request received</h2>

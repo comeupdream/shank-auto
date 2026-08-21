@@ -8,17 +8,27 @@
  * leaves the model list ready to pick from, because a VIN alone can't name the
  * model. Nothing here is blocking: every field stays editable, so a decode
  * that lands slightly wrong is one tap to correct rather than a dead end.
+ *
+ * Everything runs in the browser — the VIN math and the catalog are pure,
+ * bundled code (the XAT Racing approach), so this component works identically
+ * on a Node deployment and on a fully static build with no server at all.
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   VEHICLE_CLASSES,
   VEHICLE_CLASS_LABELS,
   canonicalMake,
-  type Model,
+  makesForYear,
   type VehicleClass,
   years as catalogYears,
 } from "@/lib/vehicle-catalog";
+import {
+  LocalVehicleProvider,
+  localModelsFor,
+  type VehicleIdentity,
+} from "@/lib/vehicle-provider";
+import { normalizeVin } from "@/lib/vin";
 import { fitmentSummary, matchFitment } from "@/lib/xat-fitment";
 
 export type Vehicle = {
@@ -44,30 +54,12 @@ type Props = {
   onChange: (v: Vehicle) => void;
 };
 
-type DecodeResponse = {
-  year: number | null;
-  make: string | null;
-  model: string | null;
-  trim: string | null;
-  vehicleClass: VehicleClass;
-  notes: string[];
-  decoded: {
-    valid: boolean;
-    errors: string[];
-    checkDigitValid: boolean | null;
-    positions: Record<string, string>;
-    country: string | null;
-    manufacturer: string | null;
-  } | null;
-};
-
 const YEARS = catalogYears();
+const LOCAL = new LocalVehicleProvider();
 
 export default function VehiclePicker({ value, onChange }: Props) {
-  const [makes, setMakes] = useState<string[]>([]);
-  const [models, setModels] = useState<Model[]>([]);
   const [decoding, setDecoding] = useState(false);
-  const [decode, setDecode] = useState<DecodeResponse | null>(null);
+  const [decode, setDecode] = useState<VehicleIdentity | null>(null);
   const [vinError, setVinError] = useState<string | null>(null);
   /** Set when the class came from a decode, so manual edits aren't overwritten. */
   const classTouched = useRef(false);
@@ -77,45 +69,16 @@ export default function VehiclePicker({ value, onChange }: Props) {
     [onChange, value],
   );
 
-  // Year → makes.
-  useEffect(() => {
-    if (!value.year) {
-      setMakes([]);
-      return;
-    }
-    let cancelled = false;
-    fetch(`/api/ymm?year=${value.year}`)
-      .then((r) => r.json())
-      .then((d) => {
-        if (!cancelled) setMakes(d.makes ?? []);
-      })
-      .catch(() => {
-        if (!cancelled) setMakes([]);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [value.year]);
-
-  // Year + make → models.
-  useEffect(() => {
-    if (!value.year || !value.make) {
-      setModels([]);
-      return;
-    }
-    let cancelled = false;
-    fetch(`/api/ymm?year=${value.year}&make=${encodeURIComponent(value.make)}`)
-      .then((r) => r.json())
-      .then((d) => {
-        if (!cancelled) setModels(d.models ?? []);
-      })
-      .catch(() => {
-        if (!cancelled) setModels([]);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [value.year, value.make]);
+  // The cascade reads the bundled catalog directly — no round-trips.
+  const makes = useMemo(
+    () => (value.year ? makesForYear(Number(value.year)) : []),
+    [value.year],
+  );
+  const models = useMemo(
+    () =>
+      value.year && value.make ? localModelsFor(value.make, Number(value.year)) : [],
+    [value.year, value.make],
+  );
 
   // Picking a model sets the service class, unless the user overrode it.
   useEffect(() => {
@@ -136,8 +99,7 @@ export default function VehiclePicker({ value, onChange }: Props) {
     setDecoding(true);
     setVinError(null);
     try {
-      const res = await fetch(`/api/vin/${encodeURIComponent(vin)}`);
-      const data: DecodeResponse = await res.json();
+      const data = await LOCAL.decodeVin(normalizeVin(vin));
 
       if (data.decoded && !data.decoded.valid) {
         setDecode(data);
@@ -145,11 +107,11 @@ export default function VehiclePicker({ value, onChange }: Props) {
         return;
       }
 
-      // Server decode gives make/year offline. For model + trim, do what the
-      // XAT Racing site does (assets/js/ymm.js): call NHTSA vPIC straight
-      // from the browser — free, keyless, CORS-open, and unaffected by
-      // server-side network policy. Best-effort: any failure just leaves the
-      // model dropdown for the customer.
+      // The local decode gives make/year instantly, offline. For model +
+      // trim, do what the XAT Racing site does (assets/js/ymm.js): call
+      // NHTSA vPIC straight from the browser — free, keyless, CORS-open.
+      // Best-effort: any failure just leaves the model dropdown for the
+      // customer.
       let model = data.model;
       let trim = data.trim;
       let year = data.year;
@@ -177,7 +139,7 @@ export default function VehiclePicker({ value, onChange }: Props) {
         vehicleClass: data.vehicleClass,
       });
     } catch {
-      setVinError("Couldn't reach the decoder. Enter the vehicle by hand below.");
+      setVinError("Couldn't decode that VIN. Enter the vehicle by hand below.");
     } finally {
       setDecoding(false);
     }

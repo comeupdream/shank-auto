@@ -83,8 +83,9 @@ xatracing.onrender.com), three things are ported:
 
 ```bash
 npm install
-npm run dev        # http://localhost:3000
-npm test           # VIN, catalog, availability, sheet-import tests
+npm run dev           # http://localhost:3000
+npm test              # VIN, catalog, availability, sheet-import tests
+npm run build:static  # static demo build → out/ (see below)
 ```
 
 - `/` `/services` `/estimate` `/book` — public
@@ -93,6 +94,33 @@ npm test           # VIN, catalog, availability, sheet-import tests
 
 No database needed: appointments persist to `data/appointments.json`
 (gitignored). See `.env.example` for the knobs.
+
+## Static demo deploy (Render)
+
+The demo deploys as a **Render Static Site** — no server, no env vars:
+
+| Render field | Value |
+| ------------ | ----- |
+| Build Command | `npm ci && npm run build:static` |
+| Publish Directory | `out` |
+
+Or skip the form: **New → Blueprint** on this repo reads
+[`render.yaml`](render.yaml). Node version comes from `.node-version`.
+
+`build:static` runs `next build` with `output: "export"`, hiding the
+server-only segments (`/api`, `/admin`) for the duration of the build
+(`scripts/build-static.mjs`). The static build stays genuinely usable
+because the vehicle stack is pure bundled code:
+
+- **VIN decode and the year/make/model cascade run in the browser** —
+  the WMI math, catalog, and XAT fitment ship in the bundle, and the
+  browser-side vPIC call still fills in model/trim on customer networks.
+- **Booking shows real slot math** (hours, lead time, closed days) computed
+  client-side against an empty schedule; submitting shows a clearly-marked
+  demo notice with the shop's phone number instead of recording anything.
+  The estimate form does the same.
+- `/admin` and the JSON appointment book don't exist in this build — they
+  need the Node deployment (`npm run build` + `npm start` on any Node host).
 
 ## Tech
 

@@ -74,12 +74,21 @@ export class LocalVehicleProvider implements VehicleDataProvider {
   }
 
   async modelsFor(make: string, year: number): Promise<Model[]> {
-    const canonical = canonicalMake(make);
-    if (!canonical) return [];
-    const inYear = modelsFor(canonical, year);
-    // A year outside the catalog's range shouldn't leave the dropdown empty.
-    return inYear.length > 0 ? inYear : allModelsFor(canonical);
+    return localModelsFor(make, year);
   }
+}
+
+/**
+ * Sync core of the local model lookup. The browser UI calls this directly
+ * (the catalog ships in the bundle, so no round-trip is needed), and it is
+ * everything the local provider's async `modelsFor` does.
+ */
+export function localModelsFor(make: string, year: number): Model[] {
+  const canonical = canonicalMake(make);
+  if (!canonical) return [];
+  const inYear = modelsFor(canonical, year);
+  // A year outside the catalog's range shouldn't leave the dropdown empty.
+  return inYear.length > 0 ? inYear : allModelsFor(canonical);
 }
 
 function localIdentity(vin: string, provider: string): VehicleIdentity {

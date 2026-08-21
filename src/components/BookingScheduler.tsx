@@ -7,20 +7,33 @@
  * math the create call re-validates server-side — so a stale slot degrades to
  * a clear "just taken" message, never a double booking. Structure follows
  * Revive Detail's BookingForm, trimmed to a repair-shop flow.
+ *
+ * On a static-demo build there is no server: the same slot math runs in the
+ * browser against an empty book, and submitting shows a demo notice instead
+ * of recording anything.
  */
 
 import { useEffect, useState } from "react";
 import VehiclePicker, { EMPTY_VEHICLE, type Vehicle } from "./VehiclePicker";
+import { computeAvailableSlots } from "@/lib/availability";
 import { formatPrice, priceFor, type Service } from "@/lib/services";
-import { formatTime12 } from "@/lib/time";
+import { SHOP, shopTodayISO, telHref } from "@/lib/shop-config";
+import { STATIC_DEMO } from "@/lib/static-demo";
+import { addDaysISO, formatTime12 } from "@/lib/time";
 
 type Props = {
   services: Service[];
-  minDate: string;
-  maxDate: string;
 };
 
-export default function BookingScheduler({ services, minDate, maxDate }: Props) {
+export default function BookingScheduler({ services }: Props) {
+  // "Today" is computed after mount so the prerendered HTML doesn't bake in
+  // the build day — the page itself stays fully static.
+  const [dateRange, setDateRange] = useState<{ min: string; max: string } | null>(null);
+  useEffect(() => {
+    const today = shopTodayISO();
+    setDateRange({ min: today, max: addDaysISO(today, SHOP.bookingHorizonDays) });
+  }, []);
+
   const [serviceId, setServiceId] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -50,6 +63,14 @@ export default function BookingScheduler({ services, minDate, maxDate }: Props) 
       setSlots([]);
       return;
     }
+    if (STATIC_DEMO) {
+      // No server to ask — run the availability math right here, against an
+      // empty schedule. Real deployments ask the API so existing bookings
+      // block their slots.
+      const svc = services.find((s) => s.id === serviceId);
+      setSlots(svc ? computeAvailableSlots(date, svc.minutes, []) : []);
+      return;
+    }
     let cancelled = false;
     setSlotsLoading(true);
     fetch(`/api/availability?date=${date}&serviceId=${encodeURIComponent(serviceId)}`)
@@ -66,7 +87,7 @@ export default function BookingScheduler({ services, minDate, maxDate }: Props) 
     return () => {
       cancelled = true;
     };
-  }, [serviceId, date]);
+  }, [serviceId, date, services]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -77,6 +98,11 @@ export default function BookingScheduler({ services, minDate, maxDate }: Props) 
     if (!name.trim()) return setError("Please enter your name.");
     if (!phone.trim() && !email.trim()) {
       return setError("Please leave a phone number or an email.");
+    }
+
+    if (STATIC_DEMO) {
+      setConfirmed({ date, time });
+      return;
     }
 
     setSubmitting(true);
@@ -116,6 +142,22 @@ export default function BookingScheduler({ services, minDate, maxDate }: Props) 
   }
 
   if (confirmed && service) {
+    if (STATIC_DEMO) {
+      return (
+        <div className="rounded-lg border border-amber-300 bg-amber-50 p-6">
+          <h2 className="text-lg font-bold text-amber-900">Demo only — nothing was booked</h2>
+          <p className="mt-2 text-sm text-amber-800">
+            This is a static preview, so your {service.name.toLowerCase()} on{" "}
+            {confirmed.date} at {formatTime12(confirmed.time)} was not put on the
+            schedule. To actually book, call{" "}
+            <a href={telHref()} className="font-semibold underline">
+              {SHOP.phone}
+            </a>
+            .
+          </p>
+        </div>
+      );
+    }
     return (
       <div className="rounded-lg border border-green-300 bg-green-50 p-6">
         <h2 className="text-lg font-bold text-green-900">You&apos;re booked</h2>
@@ -171,8 +213,8 @@ export default function BookingScheduler({ services, minDate, maxDate }: Props) 
             <input
               type="date"
               value={date}
-              min={minDate}
-              max={maxDate}
+              min={dateRange?.min}
+              max={dateRange?.max}
               onChange={(e) => setDate(e.target.value)}
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-navy-500 focus:outline-none focus:ring-1 focus:ring-navy-500"
             />
