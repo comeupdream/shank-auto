@@ -19,12 +19,15 @@ import {
   VEHICLE_CLASSES,
   VEHICLE_CLASS_LABELS,
   canonicalMake,
+  classifyVehicle,
+  findModel,
   makesForYear,
   type VehicleClass,
   years as catalogYears,
 } from "@/lib/vehicle-catalog";
 import {
   LocalVehicleProvider,
+  classFromBodyClass,
   localModelsFor,
   type VehicleIdentity,
 } from "@/lib/vehicle-provider";
@@ -56,6 +59,15 @@ type Props = {
 
 const YEARS = catalogYears();
 const LOCAL = new LocalVehicleProvider();
+
+/** Compact class names for the decode panel's "Type" fact. */
+const SHORT_CLASS: Record<VehicleClass, string> = {
+  sedan: "Car / Sedan",
+  suv: "SUV",
+  truck: "Truck",
+  minivan: "Minivan",
+  van: "Van",
+};
 
 export default function VehiclePicker({ value, onChange }: Props) {
   // Several pickers can share a page (home quote tool + scheduler).
@@ -119,6 +131,7 @@ export default function VehiclePicker({ value, onChange }: Props) {
       let year = data.year;
       let make = data.make;
       let notes = data.notes;
+      let vehicleClass = data.vehicleClass;
       if (!model) {
         const live = await browserVpicDecode(vin);
         if (live) {
@@ -127,9 +140,19 @@ export default function VehiclePicker({ value, onChange }: Props) {
           year = live.year ?? year;
           make = live.make ?? make;
           notes = notes.filter((n) => !n.startsWith("Model and trim"));
+          if (model) {
+            // Auto-identity, same chain as the server provider: the catalog
+            // is authoritative, vPIC's body class covers what the catalog
+            // doesn't, and the keyword classifier is the floor.
+            const catalogModel = make ? findModel(make, model, year ?? undefined) : null;
+            vehicleClass =
+              catalogModel?.vehicleClass ??
+              classFromBodyClass(live.bodyClass) ??
+              classifyVehicle([year, make, model].filter(Boolean).join(" "));
+          }
         }
       }
-      setDecode({ ...data, model, trim, year, make, notes });
+      setDecode({ ...data, model, trim, year, make, notes, vehicleClass });
 
       classTouched.current = false;
       onChange({
@@ -138,7 +161,7 @@ export default function VehiclePicker({ value, onChange }: Props) {
         make: make ?? value.make,
         model: model ?? "",
         trim: trim ?? "",
-        vehicleClass: data.vehicleClass,
+        vehicleClass,
       });
     } catch {
       setVinError("Couldn't decode that VIN. Enter the vehicle by hand below.");
@@ -201,10 +224,14 @@ export default function VehiclePicker({ value, onChange }: Props) {
         )}
 
         {decoded?.valid && (
-          <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 rounded-md bg-slate-50 p-3 text-xs sm:grid-cols-4">
+          <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 rounded-md bg-slate-50 p-3 text-xs sm:grid-cols-5">
             <Fact label="Manufacturer" value={decoded.manufacturer} />
             <Fact label="Built in" value={decoded.country} />
             <Fact label="Model year" value={decode?.year ? String(decode.year) : null} />
+            <Fact
+              label="Type"
+              value={decode ? SHORT_CLASS[decode.vehicleClass] : null}
+            />
             <Fact
               label="Check digit"
               value={
@@ -323,6 +350,7 @@ async function browserVpicDecode(vin: string): Promise<{
   make: string | null;
   model: string | null;
   trim: string | null;
+  bodyClass: string | null;
 } | null> {
   try {
     const res = await fetch(
@@ -349,6 +377,7 @@ async function browserVpicDecode(vin: string): Promise<{
         : null,
       model: clean("Model"),
       trim: clean("Trim") ?? clean("Series"),
+      bodyClass: clean("BodyClass"),
     };
   } catch {
     return null;

@@ -246,8 +246,12 @@ export class VpicVehicleProvider implements VehicleDataProvider {
   }
 }
 
-/** Map vPIC's `BodyClass` vocabulary onto our five service classes. */
-function classFromBodyClass(bodyClass: string | null): VehicleClass | null {
+/**
+ * Map vPIC's `BodyClass` vocabulary onto our five service classes. Exported
+ * because the browser-side decode (VehiclePicker) runs the same auto-identity
+ * chain the server provider does: catalog model → body class → keyword guess.
+ */
+export function classFromBodyClass(bodyClass: string | null): VehicleClass | null {
   if (!bodyClass) return null;
   const b = bodyClass.toLowerCase();
   if (b.includes("pickup")) return "truck";
