@@ -19,6 +19,24 @@ body {
   @apply bg-navy-600 text-white;
 }
 
+/* One card language everywhere: soft radius, hairline border, tinted shadow. */
+@layer components {
+  .card {
+    @apply rounded-xl border border-slate-200/70 bg-white shadow-card;
+  }
+  /* Step number chip used by the booking / estimate form legends. */
+  .step-chip {
+    @apply grid h-7 w-7 shrink-0 place-items-center rounded-full bg-navy-600 font-display text-base font-semibold text-white;
+  }
+}
+
+/* Visible keyboard focus everywhere, without shifting layout. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid #39618d;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 /* ---------------------------------------------------------------------------
  * Shank shield logo — procedural build sequence (ShankLogo.tsx).
  *

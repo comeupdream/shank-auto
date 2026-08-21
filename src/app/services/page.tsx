@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SectionHeader from "@/components/SectionHeader";
 import { CORE_CHARGES, CORE_POLICY } from "@/lib/core-charges";
 import { CLASS_LABOR_MULTIPLIER, formatPrice, servicesByCategory } from "@/lib/services";
 import { VEHICLE_CLASS_LABELS, VEHICLE_CLASSES } from "@/lib/vehicle-catalog";
@@ -7,32 +8,33 @@ export const metadata = { title: "Services — Shank Auto Repair" };
 
 export default function ServicesPage() {
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="font-display text-4xl font-semibold uppercase tracking-wide text-slate-900">Services</h1>
-        <p className="mt-2 text-slate-600">
-          Flat-rate maintenance is priced below. Repairs are quoted after we look
-          the vehicle over — we call you with a number before any work starts.
-        </p>
-      </div>
+    <div className="space-y-10">
+      <SectionHeader
+        as="h1"
+        kicker="The menu"
+        title="Services"
+        blurb="Flat-rate maintenance is priced below. Repairs are quoted after we look the vehicle over — we call you with a number before any work starts."
+      />
 
       {servicesByCategory().map(({ category, services }) => (
         <section key={category}>
-          <h2 className="text-sm font-bold uppercase tracking-wide text-accent-dark">
+          <h2 className="text-xs font-bold uppercase tracking-[0.25em] text-accent-dark">
             {category}
           </h2>
-          <ul className="mt-2 divide-y divide-slate-200 rounded-lg bg-white shadow-card">
+          <ul className="card mt-3 divide-y divide-slate-100 overflow-hidden">
             {services.map((s) => (
-              <li key={s.id} className="flex flex-wrap gap-2 p-4">
+              <li key={s.id} className="flex flex-wrap items-baseline gap-2 p-4 transition-colors hover:bg-slate-50">
                 <div className="min-w-0 flex-1">
                   <h3 className="font-semibold text-slate-900">{s.name}</h3>
                   <p className="text-sm text-slate-600">{s.description}</p>
                 </div>
                 <div className="text-right text-sm">
                   {s.estimateOnly ? (
-                    <span className="text-slate-500">Estimate</span>
+                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500">
+                      Estimate
+                    </span>
                   ) : (
-                    <span className="font-semibold text-slate-900">
+                    <span className="font-display text-xl font-semibold tabular-nums text-slate-900">
                       {formatPrice(s.priceCents)}
                     </span>
                   )}
@@ -43,7 +45,7 @@ export default function ServicesPage() {
         </section>
       ))}
 
-      <section className="rounded-lg bg-white p-5 shadow-card">
+      <section className="card p-5 sm:p-6">
         <h2 className="font-semibold text-slate-900">Core charge program</h2>
         <p className="mt-1 text-sm text-slate-600">{CORE_POLICY}</p>
         <table className="mt-3 w-full text-sm">
@@ -67,7 +69,7 @@ export default function ServicesPage() {
         </table>
       </section>
 
-      <section className="rounded-lg bg-white p-5 shadow-card">
+      <section className="card p-5 sm:p-6">
         <h2 className="font-semibold text-slate-900">A note on pricing</h2>
         <p className="mt-1 text-sm text-slate-600">
           Listed prices are for a car. Larger vehicles take longer on the lift,

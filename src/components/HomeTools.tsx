@@ -31,7 +31,7 @@ export default function HomeTools() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,7fr),minmax(0,5fr)]">
-      <div className="rounded-xl bg-white p-5 shadow-card sm:p-6">
+      <div className="card p-5 sm:p-6">
         <h3 className="text-sm font-bold uppercase tracking-wide text-accent-dark">
           1 · Your vehicle
         </h3>
@@ -41,14 +41,14 @@ export default function HomeTools() {
       </div>
 
       <div className="flex flex-col gap-6">
-        <div className="rounded-xl bg-white p-5 shadow-card sm:p-6">
+        <div className="card p-5 sm:p-6">
           <h3 className="text-sm font-bold uppercase tracking-wide text-accent-dark">
             2 · The job
           </h3>
           <select
             value={serviceId}
             onChange={(e) => setServiceId(e.target.value)}
-            className="mt-3 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-navy-500 focus:outline-none focus:ring-1 focus:ring-navy-500"
+            className="mt-3 w-full rounded-md border border-slate-300 px-3 py-2 text-sm transition-shadow focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-500/25"
           >
             {SERVICES.map((s) => (
               <option key={s.id} value={s.id}>

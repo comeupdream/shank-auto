@@ -1,6 +1,7 @@
 import Link from "next/link";
 import BookingScheduler from "@/components/BookingScheduler";
 import HomeTools from "@/components/HomeTools";
+import SectionHeader from "@/components/SectionHeader";
 import ShankLogo from "@/components/ShankLogo";
 import { SERVICES, servicesByCategory } from "@/lib/services";
 import { SHOP, directionsHref, hoursForDisplay, telHref } from "@/lib/shop-config";
@@ -91,7 +92,7 @@ export default function HomePage() {
           title="Book a drop-off"
           blurb="Live openings from the shop schedule — long jobs hold the time they need, and a taken slot never shows."
         />
-        <div className="mt-6 rounded-xl bg-white p-5 shadow-card sm:p-8">
+        <div className="card mt-6 p-5 sm:p-8">
           <BookingScheduler services={SERVICES} />
         </div>
       </section>
@@ -107,7 +108,7 @@ export default function HomePage() {
           {servicesByCategory().map(({ category, services }) => (
             <div
               key={category}
-              className="rounded-xl bg-white p-5 shadow-card transition-transform hover:-translate-y-0.5"
+              className="card p-5 transition-transform hover:-translate-y-0.5"
             >
               <h3 className="text-sm font-bold uppercase tracking-wide text-accent-dark">
                 {category}
@@ -130,7 +131,7 @@ export default function HomePage() {
 
       {/* ------------------------------------------------------- Visit us */}
       <section className="grid gap-6 lg:grid-cols-3">
-        <div className="rounded-xl bg-white p-5 shadow-card">
+        <div className="card p-5">
           <h3 className="text-sm font-bold uppercase tracking-wide text-accent-dark">Hours</h3>
           <dl className="mt-3 space-y-1.5 text-sm">
             {hoursForDisplay().map(({ day, hours }) => (
@@ -141,7 +142,7 @@ export default function HomePage() {
             ))}
           </dl>
         </div>
-        <div className="rounded-xl bg-white p-5 shadow-card">
+        <div className="card p-5">
           <h3 className="text-sm font-bold uppercase tracking-wide text-accent-dark">Find us</h3>
           <address className="mt-3 text-sm not-italic leading-relaxed text-slate-700">
             <strong className="text-slate-900">{SHOP.name}</strong>
@@ -185,22 +186,3 @@ export default function HomePage() {
   );
 }
 
-function SectionHeader({
-  kicker,
-  title,
-  blurb,
-}: {
-  kicker: string;
-  title: string;
-  blurb: string;
-}) {
-  return (
-    <div className="max-w-2xl">
-      <p className="text-xs font-bold uppercase tracking-[0.25em] text-accent-dark">{kicker}</p>
-      <h2 className="mt-1 font-display text-4xl font-semibold uppercase tracking-wide text-slate-900">
-        {title}
-      </h2>
-      <p className="mt-2 text-slate-600">{blurb}</p>
-    </div>
-  );
-}

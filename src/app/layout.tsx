@@ -40,22 +40,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="flex min-h-screen flex-col">
         <header className="sticky top-0 z-40 border-b border-white/10 bg-chassis/95 text-white backdrop-blur">
-          <nav className="mx-auto flex max-w-6xl flex-wrap items-center gap-1 px-4">
-            <Link href="/" aria-label="Shank Auto Repair home" className="mr-2 py-1.5">
+          <nav className="mx-auto flex max-w-6xl flex-wrap items-center px-4">
+            <Link href="/" aria-label="Shank Auto Repair home" className="mr-auto py-1.5 sm:mr-2">
               <ShankLogo className="w-9" />
             </Link>
-            {NAV.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="rounded-md px-4 py-3 text-sm text-slate-200 transition-colors hover:bg-white/10 hover:text-white"
-              >
-                {item.label}
-              </Link>
-            ))}
+            {/* On phones the links drop to their own horizontally-scrollable
+                row; from sm up everything sits on one line. */}
+            <div className="order-last -mx-1 flex w-full items-center gap-0.5 overflow-x-auto pb-1.5 sm:order-none sm:mx-0 sm:w-auto sm:gap-1 sm:overflow-visible sm:pb-0">
+              {NAV.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="whitespace-nowrap rounded-md px-3 py-2 text-sm text-slate-200 transition-colors hover:bg-white/10 hover:text-white sm:px-4 sm:py-3"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
             <a
               href={telHref()}
-              className="ml-auto px-4 py-3 text-sm font-bold text-accent"
+              className="py-3 pl-3 text-sm font-bold text-accent sm:ml-auto sm:px-4"
             >
               {SHOP.phone}
             </a>

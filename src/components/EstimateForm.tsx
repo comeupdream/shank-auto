@@ -212,23 +212,27 @@ export default function EstimateForm({ services }: Props) {
   return (
     <form onSubmit={submit} className="space-y-8">
       <fieldset>
-        <legend className="text-lg font-bold text-slate-900">1. Your vehicle</legend>
+        <legend className="flex items-center gap-2.5 text-lg font-bold text-slate-900">
+          <span className="step-chip">1</span>Your vehicle
+        </legend>
         <div className="mt-4">
           <VehiclePicker value={vehicle} onChange={setVehicle} />
         </div>
       </fieldset>
 
       <fieldset>
-        <legend className="text-lg font-bold text-slate-900">2. What you need</legend>
+        <legend className="flex items-center gap-2.5 text-lg font-bold text-slate-900">
+          <span className="step-chip">2</span>What you need
+        </legend>
 
         <div className="mt-4 grid gap-2 sm:grid-cols-2">
           {services.map((s) => (
             <label
               key={s.id}
-              className={`flex cursor-pointer gap-3 rounded-md border p-3 text-sm ${
+              className={`flex cursor-pointer gap-3 rounded-lg border p-3 text-sm transition-colors ${
                 serviceId === s.id
-                  ? "border-navy-500 bg-navy-50"
-                  : "border-slate-200 bg-white hover:border-slate-300"
+                  ? "border-navy-500 bg-navy-50 ring-1 ring-navy-500"
+                  : "border-slate-200 bg-white hover:border-navy-300"
               }`}
             >
               <input
@@ -237,7 +241,7 @@ export default function EstimateForm({ services }: Props) {
                 value={s.id}
                 checked={serviceId === s.id}
                 onChange={() => setServiceId(s.id)}
-                className="mt-1"
+                className="mt-1 accent-navy-600"
               />
               <span>
                 <span className="block font-semibold text-slate-900">{s.name}</span>
@@ -290,13 +294,15 @@ export default function EstimateForm({ services }: Props) {
             onChange={(e) => setConcern(e.target.value)}
             rows={3}
             placeholder="Noises, warning lights, when it happens…"
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-navy-500 focus:outline-none focus:ring-1 focus:ring-navy-500"
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm transition-shadow focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-500/25"
           />
         </label>
       </fieldset>
 
       <fieldset>
-        <legend className="text-lg font-bold text-slate-900">3. How to reach you</legend>
+        <legend className="flex items-center gap-2.5 text-lg font-bold text-slate-900">
+          <span className="step-chip">3</span>How to reach you
+        </legend>
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
           <Input label="Name" value={name} onChange={setName} required />
           <Input label="Phone" value={phone} onChange={setPhone} type="tel" />
@@ -344,7 +350,7 @@ function Input({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-navy-500 focus:outline-none focus:ring-1 focus:ring-navy-500"
+        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm transition-shadow focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-500/25"
       />
     </label>
   );

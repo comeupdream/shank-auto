@@ -205,7 +205,7 @@ export default function VehiclePicker({ value, onChange }: Props) {
             spellCheck={false}
             autoComplete="off"
             placeholder="1HGCM82633A004352"
-            className="w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm uppercase tracking-wider focus:border-navy-500 focus:outline-none focus:ring-1 focus:ring-navy-500"
+            className="w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm uppercase tracking-wider transition-shadow focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-500/25"
           />
           <button
             type="button"
@@ -385,7 +385,7 @@ async function browserVpicDecode(vin: string): Promise<{
 }
 
 const selectClass =
-  "w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-navy-500 focus:outline-none focus:ring-1 focus:ring-navy-500 disabled:bg-slate-100 disabled:text-slate-400";
+  "w-full rounded-md border border-slate-300 px-3 py-2 text-sm transition-shadow focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-500/25 disabled:bg-slate-100 disabled:text-slate-400";
 
 function Field({
   label,
