@@ -8,14 +8,23 @@
  * a clear "just taken" message, never a double booking. Structure follows
  * Revive Detail's BookingForm, trimmed to a repair-shop flow.
  *
- * On a static-demo build there is no server: the same slot math runs in the
- * browser against an empty book, and submitting shows a demo notice instead
- * of recording anything.
+ * On a static-demo build there is no server: the same engine runs in the
+ * browser against a demo book kept in this device's localStorage
+ * (demo-store.ts). Demo bookings really consume their slots — long jobs
+ * swallow the following ones, a just-taken time is refused on re-check —
+ * and every confirmation is clearly labeled a demo.
  */
 
 import { useEffect, useState } from "react";
 import VehiclePicker, { EMPTY_VEHICLE, type Vehicle } from "./VehiclePicker";
 import { computeAvailableSlots } from "@/lib/availability";
+import {
+  addDemoAppointment,
+  clearDemoAppointments,
+  demoAppointments,
+  demoBusyBlocks,
+  type DemoAppointment,
+} from "@/lib/demo-store";
 import { formatPrice, priceFor, type Service } from "@/lib/services";
 import { SHOP, shopTodayISO, telHref } from "@/lib/shop-config";
 import { STATIC_DEMO } from "@/lib/static-demo";
@@ -48,7 +57,16 @@ export default function BookingScheduler({ services }: Props) {
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [confirmed, setConfirmed] = useState<{ date: string; time: string } | null>(null);
+  const [confirmed, setConfirmed] = useState<
+    { date: string; time: string; ref?: string } | null
+  >(null);
+
+  // The device-local demo book (static demo only). Loaded after mount —
+  // localStorage doesn't exist during prerender.
+  const [demoBook, setDemoBook] = useState<DemoAppointment[]>([]);
+  useEffect(() => {
+    if (STATIC_DEMO) setDemoBook(demoAppointments());
+  }, []);
 
   const service = services.find((s) => s.id === serviceId);
   const price = service ? priceFor(service, vehicle.vehicleClass) : null;
@@ -64,11 +82,11 @@ export default function BookingScheduler({ services }: Props) {
       return;
     }
     if (STATIC_DEMO) {
-      // No server to ask — run the availability math right here, against an
-      // empty schedule. Real deployments ask the API so existing bookings
-      // block their slots.
+      // No server to ask — run the availability engine right here against
+      // the device-local demo book, so demo bookings block their slots just
+      // like real ones do on the Node deployment.
       const svc = services.find((s) => s.id === serviceId);
-      setSlots(svc ? computeAvailableSlots(date, svc.minutes, []) : []);
+      setSlots(svc ? computeAvailableSlots(date, svc.minutes, demoBusyBlocks(date)) : []);
       return;
     }
     let cancelled = false;
@@ -87,7 +105,7 @@ export default function BookingScheduler({ services }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [serviceId, date, services]);
+  }, [serviceId, date, services, demoBook]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -101,7 +119,30 @@ export default function BookingScheduler({ services }: Props) {
     }
 
     if (STATIC_DEMO) {
-      setConfirmed({ date, time });
+      // Same double-booking rule the server enforces: re-check the slot
+      // against the demo book at submit time.
+      const svc = services.find((s) => s.id === serviceId);
+      if (!svc) return setError("Pick a service.");
+      const open = computeAvailableSlots(date, svc.minutes, demoBusyBlocks(date));
+      if (!open.includes(time)) {
+        setTime("");
+        setDemoBook(demoAppointments());
+        return setError(
+          "That time was just taken on this device's demo schedule — pick another.",
+        );
+      }
+      const saved = addDemoAppointment({
+        serviceId,
+        serviceName: svc.name,
+        date,
+        startTime: time,
+        durationMinutes: svc.minutes,
+        customerName: name,
+        vehicle: vehicleLabel,
+        priceCents: price,
+      });
+      setDemoBook(demoAppointments());
+      setConfirmed({ date, time, ref: saved.ref });
       return;
     }
 
@@ -144,17 +185,59 @@ export default function BookingScheduler({ services }: Props) {
   if (confirmed && service) {
     if (STATIC_DEMO) {
       return (
-        <div className="rounded-lg border border-amber-300 bg-amber-50 p-6">
-          <h2 className="text-lg font-bold text-amber-900">Demo only — nothing was booked</h2>
-          <p className="mt-2 text-sm text-amber-800">
-            This is a static preview, so your {service.name.toLowerCase()} on{" "}
-            {confirmed.date} at {formatTime12(confirmed.time)} was not put on the
-            schedule. To actually book, call{" "}
+        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-navy-700 px-5 py-3 text-white">
+            <h2 className="text-lg font-bold">Drop-off reserved</h2>
+            {confirmed.ref && (
+              <span className="rounded-md bg-white/10 px-2.5 py-1 font-mono text-sm tracking-widest">
+                {confirmed.ref}
+              </span>
+            )}
+          </div>
+          <dl className="grid gap-x-8 gap-y-3 px-5 py-4 text-sm sm:grid-cols-2">
+            <div>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Service</dt>
+              <dd className="mt-0.5 font-semibold text-slate-900">{service.name}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">When</dt>
+              <dd className="mt-0.5 font-semibold text-slate-900">
+                {confirmed.date} · {formatTime12(confirmed.time)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Vehicle</dt>
+              <dd className="mt-0.5 text-slate-900">{vehicleLabel || "—"}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Price</dt>
+              <dd className="mt-0.5 text-slate-900">
+                {price !== null ? formatPrice(price) : "Quoted after inspection"}
+              </dd>
+            </div>
+          </dl>
+          <p className="border-t border-amber-200 bg-amber-50 px-5 py-3 text-sm text-amber-800">
+            <strong>Demo booking</strong> — saved only in this browser, so you can
+            watch its slot vanish from the picker. Nothing reached the shop. To
+            really book, call{" "}
             <a href={telHref()} className="font-semibold underline">
               {SHOP.phone}
             </a>
             .
           </p>
+          <div className="px-5 py-4">
+            <button
+              type="button"
+              onClick={() => {
+                setConfirmed(null);
+                setDate("");
+                setTime("");
+              }}
+              className="rounded-md bg-navy-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-navy-700"
+            >
+              Book another time
+            </button>
+          </div>
         </div>
       );
     }
@@ -305,10 +388,38 @@ export default function BookingScheduler({ services }: Props) {
       <button
         type="submit"
         disabled={submitting}
-        className="rounded-md bg-navy-600 px-6 py-3 text-sm font-semibold text-white hover:bg-navy-700 disabled:opacity-50"
+        className="rounded-md bg-navy-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-navy-700 disabled:opacity-50"
       >
         {submitting ? "Booking…" : "Book it"}
       </button>
+
+      {STATIC_DEMO && demoBook.length > 0 && (
+        <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-sm">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="font-semibold text-slate-900">Demo schedule on this device</h3>
+            <button
+              type="button"
+              onClick={() => {
+                clearDemoAppointments();
+                setDemoBook([]);
+              }}
+              className="text-xs font-semibold text-navy-700 underline"
+            >
+              Clear it
+            </button>
+          </div>
+          <ul className="mt-2 space-y-1 text-slate-600">
+            {demoBook.map((a) => (
+              <li key={a.id} className="flex flex-wrap justify-between gap-x-4">
+                <span>
+                  {a.date} · {formatTime12(a.startTime)} — {a.serviceName}
+                </span>
+                <span className="font-mono text-xs tracking-wider text-slate-400">{a.ref}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </form>
   );
 }

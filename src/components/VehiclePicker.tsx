@@ -14,7 +14,7 @@
  * on a Node deployment and on a fully static build with no server at all.
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   VEHICLE_CLASSES,
   VEHICLE_CLASS_LABELS,
@@ -58,6 +58,8 @@ const YEARS = catalogYears();
 const LOCAL = new LocalVehicleProvider();
 
 export default function VehiclePicker({ value, onChange }: Props) {
+  // Several pickers can share a page (home quote tool + scheduler).
+  const vinId = useId();
   const [decoding, setDecoding] = useState(false);
   const [decode, setDecode] = useState<VehicleIdentity | null>(null);
   const [vinError, setVinError] = useState<string | null>(null);
@@ -157,7 +159,7 @@ export default function VehiclePicker({ value, onChange }: Props) {
     <div className="space-y-6">
       {/* ------------------------------------------------------------- VIN */}
       <section className="rounded-lg border border-slate-200 bg-white p-4">
-        <label htmlFor="vin" className="block text-sm font-semibold text-slate-900">
+        <label htmlFor={vinId} className="block text-sm font-semibold text-slate-900">
           VIN <span className="font-normal text-slate-500">(optional — fastest way)</span>
         </label>
         <p className="mt-1 text-xs text-slate-500">
@@ -167,7 +169,7 @@ export default function VehiclePicker({ value, onChange }: Props) {
 
         <div className="mt-2 flex flex-col gap-2 sm:flex-row">
           <input
-            id="vin"
+            id={vinId}
             value={value.vin}
             onChange={(e) => set({ vin: e.target.value.toUpperCase() })}
             onKeyDown={(e) => {

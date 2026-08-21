@@ -6,8 +6,17 @@
   color-scheme: light;
 }
 
+html {
+  /* Hero CTAs jump to in-page sections (#price, #book). */
+  scroll-behavior: smooth;
+}
+
 body {
   @apply bg-slate-100 text-slate-800 antialiased;
+}
+
+::selection {
+  @apply bg-navy-600 text-white;
 }
 
 /* ---------------------------------------------------------------------------

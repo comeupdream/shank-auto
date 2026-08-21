@@ -13,6 +13,7 @@
 import { useState } from "react";
 import VehiclePicker, { EMPTY_VEHICLE, type Vehicle } from "./VehiclePicker";
 import { coreChargesForService } from "@/lib/core-charges";
+import { demoRef } from "@/lib/demo-store";
 import {
   CLASS_LABOR_MULTIPLIER,
   type Service,
@@ -22,6 +23,7 @@ import {
 import { SHOP, telHref } from "@/lib/shop-config";
 import { STATIC_DEMO } from "@/lib/static-demo";
 import { VEHICLE_CLASS_LABELS } from "@/lib/vehicle-catalog";
+import { fitmentSummary, matchFitment } from "@/lib/xat-fitment";
 
 type Props = { services: Service[] };
 
@@ -36,6 +38,8 @@ export default function EstimateForm({ services }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
+  /** Reference shown on the mocked demo estimate. */
+  const [quoteRef, setQuoteRef] = useState<string | null>(null);
 
   const service = services.find((s) => s.id === serviceId);
   const price = service ? priceFor(service, vehicle.vehicleClass) : null;
@@ -56,7 +60,9 @@ export default function EstimateForm({ services }: Props) {
     if (!serviceId) return setError("Please choose what you need.");
 
     if (STATIC_DEMO) {
-      // Static preview — there is no server to send this to.
+      // Static preview — no server to send this to, so render the estimate
+      // the shop would write up, right here.
+      setQuoteRef(demoRef());
       setSent(true);
       return;
     }
@@ -92,18 +98,103 @@ export default function EstimateForm({ services }: Props) {
 
   if (sent) {
     if (STATIC_DEMO) {
+      const fitment =
+        vehicle.year && vehicle.make && vehicle.model
+          ? matchFitment(Number(vehicle.year), vehicle.make, vehicle.model)
+          : null;
       return (
-        <div className="rounded-lg border border-amber-300 bg-amber-50 p-6">
-          <h2 className="text-lg font-bold text-amber-900">Demo only — nothing was sent</h2>
-          <p className="mt-2 text-sm text-amber-800">
-            This is a static preview, so your request about the{" "}
-            {vehicleLabel || "vehicle"} didn&apos;t go anywhere. For a real
-            estimate, call{" "}
+        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-navy-700 px-5 py-3 text-white">
+            <h2 className="text-lg font-bold">Estimate — {service?.name}</h2>
+            {quoteRef && (
+              <span className="rounded-md bg-white/10 px-2.5 py-1 font-mono text-sm tracking-widest">
+                {quoteRef}
+              </span>
+            )}
+          </div>
+
+          <div className="px-5 py-4 text-sm">
+            <dl className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
+              <div>
+                <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Vehicle</dt>
+                <dd className="mt-0.5 font-semibold text-slate-900">
+                  {vehicleLabel || "Not identified — we'll confirm at the counter"}
+                </dd>
+                {fitment && (
+                  <dd className="mt-1 text-xs text-navy-700">
+                    {fitment.model} — {fitmentSummary(fitment)}
+                  </dd>
+                )}
+              </div>
+              <div>
+                <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Prepared for</dt>
+                <dd className="mt-0.5 text-slate-900">{name}</dd>
+              </div>
+            </dl>
+
+            <div className="mt-4 rounded-lg bg-slate-50 p-4">
+              {price !== null ? (
+                <>
+                  <div className="font-display text-4xl font-semibold text-slate-900">
+                    {formatPrice(price)}
+                  </div>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Flat rate for a{" "}
+                    {VEHICLE_CLASS_LABELS[vehicle.vehicleClass].toLowerCase()}
+                    {CLASS_LABOR_MULTIPLIER[vehicle.vehicleClass] !== 1 &&
+                      " — includes the larger-vehicle labor rate"}
+                    .
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="font-semibold text-slate-900">Priced after inspection.</p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    We look the vehicle over first and call you with a number
+                    before any work starts.
+                  </p>
+                </>
+              )}
+              {coreParts.length > 0 && (
+                <p className="mt-3 border-t border-slate-200 pt-3 text-xs text-slate-500">
+                  This job can involve core-charged parts (
+                  {coreParts.map((c) => c.part.toLowerCase()).join(", ")}) —
+                  leave the old part with us and the refundable deposit is waived.
+                </p>
+              )}
+            </div>
+
+            {concern.trim() && (
+              <p className="mt-3 text-xs text-slate-500">
+                <span className="font-semibold text-slate-600">You told us:</span>{" "}
+                &ldquo;{concern.trim()}&rdquo;
+              </p>
+            )}
+          </div>
+
+          <p className="border-t border-amber-200 bg-amber-50 px-5 py-3 text-sm text-amber-800">
+            <strong>Demo estimate</strong> — written up in your browser; nothing
+            reached the shop. For the real thing, call{" "}
             <a href={telHref()} className="font-semibold underline">
               {SHOP.phone}
             </a>
             .
           </p>
+
+          <div className="px-5 py-4">
+            <button
+              type="button"
+              onClick={() => {
+                setSent(false);
+                setQuoteRef(null);
+                setServiceId("");
+                setConcern("");
+              }}
+              className="rounded-md bg-navy-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-navy-700"
+            >
+              Price another job
+            </button>
+          </div>
         </div>
       );
     }

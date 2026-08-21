@@ -115,10 +115,13 @@ because the vehicle stack is pure bundled code:
 - **VIN decode and the year/make/model cascade run in the browser** —
   the WMI math, catalog, and XAT fitment ship in the bundle, and the
   browser-side vPIC call still fills in model/trim on customer networks.
-- **Booking shows real slot math** (hours, lead time, closed days) computed
-  client-side against an empty schedule; submitting shows a clearly-marked
-  demo notice with the shop's phone number instead of recording anything.
-  The estimate form does the same.
+- **Booking runs the full Revive Detail engine against a device-local demo
+  book** (`src/lib/demo-store.ts`, localStorage): demo bookings consume
+  their slots, long jobs hold the following ones, a just-taken time is
+  refused on re-check, and confirmations carry a reference — all labeled
+  demo, nothing leaves the browser. The estimate form writes up a mocked
+  estimate the same way. The home page leads with the interactive stack:
+  instant quote, VIN decode, and the scheduler, above the fold.
 - `/admin` and the JSON appointment book don't exist in this build — they
   need the Node deployment (`npm run build` + `npm start` on any Node host).
 

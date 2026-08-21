@@ -26,7 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="flex min-h-screen flex-col">
-        <header className="bg-chassis text-white">
+        <header className="sticky top-0 z-40 border-b border-white/10 bg-chassis/95 text-white backdrop-blur">
           <nav className="mx-auto flex max-w-6xl flex-wrap items-center gap-1 px-4">
             <Link href="/" aria-label="Shank Auto Repair home" className="mr-2 py-1.5">
               <ShankLogo className="w-9" />
@@ -35,14 +35,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link
                 key={item.href}
                 href={item.href}
-                className="px-4 py-3 text-sm hover:bg-accent hover:text-chassis"
+                className="rounded-md px-4 py-3 text-sm text-slate-200 transition-colors hover:bg-white/10 hover:text-white"
               >
                 {item.label}
               </Link>
             ))}
             <a
               href={telHref()}
-              className="ml-auto px-4 py-3 text-sm font-semibold text-accent"
+              className="ml-auto px-4 py-3 text-sm font-bold text-accent"
             >
               {SHOP.phone}
             </a>
@@ -51,21 +51,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
 
-        <footer className="mt-8 border-t border-slate-300 bg-white">
-          <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 text-sm sm:grid-cols-3">
+        <footer className="mt-8 border-t border-white/10 bg-chassis text-slate-300">
+          <div className="mx-auto grid max-w-6xl gap-6 px-4 py-10 text-sm sm:grid-cols-3">
             <div>
-              <a href={`mailto:${SHOP.email}`} className="text-navy-700 underline">
+              <ShankLogo className="w-12" />
+              <a
+                href={`mailto:${SHOP.email}`}
+                className="mt-3 block text-accent underline"
+              >
                 {SHOP.email}
               </a>
             </div>
-            <p className="text-center text-slate-600">{SHOP.blurb}</p>
+            <p className="text-center text-slate-400">{SHOP.blurb}</p>
             <address className="not-italic sm:text-right">
-              <strong className="block text-slate-900">{SHOP.name}</strong>
+              <strong className="block text-white">{SHOP.name}</strong>
               {SHOP.address}
               <br />
               {SHOP.cityLine}
               <br />
-              <a href={directionsHref()} className="text-navy-700 underline">
+              <a href={directionsHref()} className="text-accent underline">
                 Directions
               </a>
             </address>
