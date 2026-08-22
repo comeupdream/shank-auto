@@ -30,6 +30,18 @@ body {
   }
 }
 
+/* Turning gears (GearCluster.tsx). Speeds mesh: the small gears counter-
+   rotate faster than the big one, like a real train. */
+@keyframes gear-rot {
+  to { transform: rotate(360deg); }
+}
+.gear-spin { animation: gear-rot 22s linear infinite; }
+.gear-spin-rev { animation: gear-rot 14s linear infinite reverse; }
+.gear-spin-rev-slow { animation: gear-rot 34s linear infinite reverse; }
+@media (prefers-reduced-motion: reduce) {
+  .gear-spin, .gear-spin-rev, .gear-spin-rev-slow { animation: none; }
+}
+
 /* Visible keyboard focus everywhere, without shifting layout. */
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
   outline: 2px solid #39618d;

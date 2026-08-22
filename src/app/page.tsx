@@ -1,8 +1,11 @@
 import Link from "next/link";
 import BookingScheduler from "@/components/BookingScheduler";
+import GarageScene from "@/components/GarageScene";
+import GearCluster from "@/components/GearCluster";
 import HomeTools from "@/components/HomeTools";
 import SectionHeader from "@/components/SectionHeader";
 import ShankLogo from "@/components/ShankLogo";
+import WireCar from "@/components/WireCar";
 import { SERVICES, servicesByCategory } from "@/lib/services";
 import { SHOP, directionsHref, hoursForDisplay, telHref } from "@/lib/shop-config";
 
@@ -22,10 +25,11 @@ export default function HomePage() {
         <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.06]" style={GRID_BG} />
         <div aria-hidden className="pointer-events-none absolute -right-28 -top-28 h-96 w-96 rounded-full bg-navy-500/40 blur-3xl" />
         <div aria-hidden className="pointer-events-none absolute -bottom-32 -left-20 h-80 w-80 rounded-full bg-navy-400/20 blur-3xl" />
+        <GearCluster className="pointer-events-none absolute -bottom-10 right-[26%] hidden w-64 text-navy-300 opacity-[0.08] lg:block" />
 
-        <div className="relative flex flex-col items-start gap-8 p-8 sm:p-10 lg:flex-row lg:items-center lg:gap-12">
+        <div className="relative flex flex-col items-start gap-8 p-8 sm:p-10 lg:flex-row lg:items-center lg:gap-10">
           <ShankLogo animate className="w-36 shrink-0 sm:w-44" />
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-xs font-bold uppercase tracking-[0.25em] text-accent">
               {SHOP.address} · {SHOP.cityLine}
             </p>
@@ -70,6 +74,14 @@ export default function HomePage() {
               )}
             </ul>
           </div>
+
+          {/* Interactive showpiece: procedural 3D wireframe coupe. */}
+          <div className="relative h-56 w-full shrink-0 lg:h-80 lg:w-[340px] xl:w-[400px]">
+            <WireCar />
+            <p className="pointer-events-none absolute inset-x-0 bottom-0 text-center text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-400/80">
+              Drag to spin
+            </p>
+          </div>
         </div>
       </section>
 
@@ -94,6 +106,25 @@ export default function HomePage() {
         />
         <div className="card mt-6 p-5 sm:p-8">
           <BookingScheduler services={SERVICES} />
+        </div>
+      </section>
+
+      {/* ------------------------------------------------ The shop floor */}
+      <section className="relative overflow-hidden rounded-2xl shadow-card">
+        <GarageScene className="h-72 w-full sm:h-80" />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[#0b1729] via-[#0b1729]/55 to-transparent"
+        />
+        <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
+          <p className="text-xs font-bold uppercase tracking-[0.25em] text-accent">The floor</p>
+          <h2 className="mt-1 font-display text-4xl font-semibold uppercase tracking-wide text-white">
+            Up on the lift, not up in the air
+          </h2>
+          <p className="mt-1 max-w-xl text-sm text-slate-300">
+            Every job starts with eyes on the vehicle — then a straight number,
+            before any wrench turns.
+          </p>
         </div>
       </section>
 

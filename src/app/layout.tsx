@@ -5,6 +5,7 @@ import "@fontsource/barlow-condensed/500.css";
 import "@fontsource/barlow-condensed/600.css";
 import "@fontsource/barlow-condensed/700.css";
 import "./globals.css";
+import GearCluster from "@/components/GearCluster";
 import ShankLogo from "@/components/ShankLogo";
 import { SHOP, directionsHref, telHref } from "@/lib/shop-config";
 
@@ -68,8 +69,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
 
-        <footer className="mt-8 border-t border-white/10 bg-chassis text-slate-300">
-          <div className="mx-auto grid max-w-6xl gap-6 px-4 py-10 text-sm sm:grid-cols-3">
+        <footer className="relative mt-8 overflow-hidden border-t border-white/10 bg-chassis text-slate-300">
+          <GearCluster className="pointer-events-none absolute -right-8 -top-6 w-48 text-navy-300 opacity-[0.07]" />
+          <div className="relative mx-auto grid max-w-6xl gap-6 px-4 py-10 text-sm sm:grid-cols-3">
             <div>
               <ShankLogo className="w-12" />
               <a
